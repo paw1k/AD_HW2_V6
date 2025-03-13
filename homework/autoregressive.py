@@ -58,7 +58,7 @@ class AutoregressiveModel(torch.nn.Module, Autoregressive):
 #         raise NotImplementedError()
         self.n_tokens = n_tokens
         self.embedding = torch.nn.Embedding(n_tokens, d_latent)
-        encoder_layer = nn.TransformerEncoderLayer(
+        encoder_layer = torch.nn.TransformerEncoderLayer(
             d_model=d_latent,
             nhead=8,
             dim_feedforward=4 * d_latent,
