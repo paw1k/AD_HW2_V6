@@ -69,22 +69,40 @@ class AutoregressiveModel(torch.nn.Module, Autoregressive):
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
 #         raise NotImplementedError()
-        B, H, W = x.shape
-        seq_len = H * W
+        if x.dim() == 2:
 
-        x_flat = x.view(B, seq_len)
+            B, seq_len = x.shape
 
-        embeddings = self.embedding(x_flat)
+            embeddings = self.embedding(x)
 
-        shifted = torch.zeros_like(embeddings)
-        shifted[:, 1:] = embeddings[:, :-1]
+            shifted = torch.zeros_like(embeddings)
+            shifted[:, 1:] = embeddings[:, :-1]
 
-        mask = torch.nn.Transformer.generate_square_subsequent_mask(seq_len).to(embeddings.device)
-        transformed = self.transformer_encoder(shifted, mask=mask)
-        logits = self.output_layer(transformed)
-        logits = logits.view(B, H, W, self.n_tokens)
+            mask = torch.nn.Transformer.generate_square_subsequent_mask(seq_len).to(x.device)
 
-        return logits, {}
+            transformed = self.transformer_encoder(shifted, mask=mask)
+
+            logits = self.output_layer(transformed)
+
+            return logits, {}
+
+        else:
+            B, H, W = x.shape
+            seq_len = H * W
+
+            x_flat = x.view(B, seq_len)
+
+            embeddings = self.embedding(x_flat)
+
+            shifted = torch.zeros_like(embeddings)
+            shifted[:, 1:] = embeddings[:, :-1]
+
+            mask = torch.nn.Transformer.generate_square_subsequent_mask(seq_len).to(embeddings.device)
+            transformed = self.transformer_encoder(shifted, mask=mask)
+            logits = self.output_layer(transformed)
+            logits = logits.view(B, H, W, self.n_tokens)
+
+            return logits, {}
 
     def generate(self, B: int = 1, h: int = 30, w: int = 20, device=None) -> torch.Tensor:  # noqa
 #         raise NotImplementedError()
