@@ -25,6 +25,7 @@ class Compressor:
         with torch.no_grad():
             tokens = self.tokenizer.encode(x.unsqueeze(0))
         tokens = tokens.squeeze(0)
+
         seq_len = tokens.shape[0]
         vocab_size = self.autoregressive.n_tokens
 
@@ -34,13 +35,26 @@ class Compressor:
                 prev_tokens = torch.tensor([], dtype=torch.long, device=x.device)
             else:
                 prev_tokens = tokens[:i]
+
             with torch.no_grad():
-                logits, _ = self.autoregressive(prev_tokens.unsqueeze(0))
-            probs = torch.softmax(logits.squeeze(0), dim=-1)
-            cdf = torch.cat([torch.zeros(1, device=probs.device), torch.cumsum(probs, dim=0)])
+                logits_2d, _ = self.autoregressive(prev_tokens.unsqueeze(0))
+
+            logits_2d = logits_2d.squeeze(0)
+
+            if logits_2d.shape[0] == 0:
+                probs = torch.ones((vocab_size,), device=x.device) / vocab_size
+            else:
+                next_token_logits = logits_2d[-1]
+                probs = torch.softmax(next_token_logits, dim=-1)
+
+            cdf = torch.cat([
+                torch.zeros(1, device=probs.device),
+                torch.cumsum(probs, dim=0)
+            ])
             cdfs.append(cdf.unsqueeze(0))
 
         cdfs_tensor = torch.cat(cdfs, dim=0).cpu()
+
         symbols = tokens.cpu().to(torch.int16)
 
         byte_stream = torchac.encode_float_cdf(cdfs_tensor, symbols, check_input_bounds=True)
@@ -57,21 +71,38 @@ class Compressor:
         seq_len = (h // patch_size) * (w // patch_size)
 
         symbols = []
-        device = self.autoregressive.device
+        device = next(self.autoregressive.parameters()).device
+
+        import torchac
+
         for i in range(seq_len):
             prev_tokens = torch.tensor(symbols, dtype=torch.long, device=device)
             with torch.no_grad():
-                logits = self.autoregressive(prev_tokens.unsqueeze(0))  # [1, vocab_size]
-            probs = torch.softmax(logits.squeeze(0), dim=-1)
-            cdf = torch.cat([torch.zeros(1, device=device), torch.cumsum(probs, dim=0)]).cpu().unsqueeze(0)
-            # Decode one symbol at a time
-            symbol = torchac.decode_float_cdf(cdf, x[i:(i+1)] if i == 0 else x)  # Simplified example
+                logits_2d, _ = self.autoregressive(prev_tokens.unsqueeze(0))
+                logits_2d = logits_2d.squeeze(0)
+
+            if logits_2d.shape[0] == 0:
+                probs = torch.ones((self.autoregressive.n_tokens,), device=device) / self.autoregressive.n_tokens
+            else:
+                next_token_logits = logits_2d[-1]
+                probs = torch.softmax(next_token_logits, dim=-1)
+
+            cdf = torch.cat([
+                torch.zeros(1, device=device),
+                torch.cumsum(probs, dim=0)
+            ]).cpu().unsqueeze(0)
+
+            if i == 0:
+                symbol = torchac.decode_float_cdf(cdf, x)
+            else:
+                symbol = torchac.decode_float_cdf(cdf, x)
             symbols.append(symbol.item())
 
         tokens = torch.tensor(symbols, dtype=torch.long, device=device)
         with torch.no_grad():
             reconstructed = self.tokenizer.decode(tokens.unsqueeze(0))
         return reconstructed.squeeze(0)
+
 
 def compress(tokenizer: Path, autoregressive: Path, image: Path, compressed_image: Path):
     """
