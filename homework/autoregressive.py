@@ -96,11 +96,14 @@ class AutoregressiveModel(torch.nn.Module, Autoregressive):
         for i in range(total_len):
             partial = output_tokens.view(B, h, w)
             logits, _ = self.forward(partial)
-
             logits = logits.view(B, total_len, self.n_tokens)
 
             next_logit = logits[:, i, :]
-            next_token = torch.argmax(next_logit, dim=-1)
+
+            probs = torch.softmax(next_logit, dim=-1)
+            next_token = torch.multinomial(probs, num_samples=1).squeeze(-1)
+
             output_tokens[:, i] = next_token
+
         return output_tokens.view(B, h, w)
 
