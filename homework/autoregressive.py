@@ -56,11 +56,12 @@ class AutoregressiveModel(torch.nn.Module, Autoregressive):
     def __init__(self, d_latent: int = 128, n_tokens: int = 2**10):
         super().__init__()
 #         raise NotImplementedError()
+        self.n_tokens = n_tokens
         self.embedding = torch.nn.Embedding(n_tokens, d_latent)
-        encoder_layer = torch.nn.TransformerEncoderLayer(
+        encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_latent,
             nhead=8,
-            dim_feedforward=4*d_latent,
+            dim_feedforward=4 * d_latent,
             batch_first=True
         )
         self.transformer_encoder = torch.nn.TransformerEncoder(encoder_layer, num_layers=2)
@@ -76,7 +77,7 @@ class AutoregressiveModel(torch.nn.Module, Autoregressive):
         embeddings = self.embedding(x_flat)
 
         shifted = torch.zeros_like(embeddings)
-        shifted[:, 1:] = embeddings[:, :-1].clone()
+        shifted[:, 1:] = embeddings[:, :-1]
 
         mask = torch.nn.Transformer.generate_square_subsequent_mask(seq_len).to(embeddings.device)
         transformed = self.transformer_encoder(shifted, mask=mask)
@@ -89,11 +90,15 @@ class AutoregressiveModel(torch.nn.Module, Autoregressive):
 #         raise NotImplementedError()
         device = device or torch.device("cpu")
         total_len = h * w
+
         output_tokens = torch.zeros((B, total_len), dtype=torch.long, device=device)
+
         for i in range(total_len):
             partial = output_tokens.view(B, h, w)
             logits, _ = self.forward(partial)
+
             logits = logits.view(B, total_len, self.n_tokens)
+
             next_logit = logits[:, i, :]
             next_token = torch.argmax(next_logit, dim=-1)
             output_tokens[:, i] = next_token
