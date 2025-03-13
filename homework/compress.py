@@ -35,7 +35,7 @@ class Compressor:
             else:
                 prev_tokens = tokens[:i]
             with torch.no_grad():
-                logits = self.autoregressive(prev_tokens.unsqueeze(0))
+                logits, _ = self.autoregressive(prev_tokens.unsqueeze(0))
             probs = torch.softmax(logits.squeeze(0), dim=-1)
             cdf = torch.cat([torch.zeros(1, device=probs.device), torch.cumsum(probs, dim=0)])
             cdfs.append(cdf.unsqueeze(0))
