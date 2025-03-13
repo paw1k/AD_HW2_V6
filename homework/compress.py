@@ -26,7 +26,7 @@ class Compressor:
             tokens = self.tokenizer.encode(x.unsqueeze(0))
         tokens = tokens.squeeze(0)
         seq_len = tokens.shape[0]
-        vocab_size = self.autoregressive.vocab_size
+        vocab_size = self.autoregressive.n_tokens
 
         cdfs = []
         for i in range(seq_len):
