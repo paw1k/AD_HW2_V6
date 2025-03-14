@@ -23,7 +23,8 @@ class Compressor:
         """
 #         raise NotImplementedError()
         with torch.no_grad():
-                tokens = self.tokenizer.encode(x.unsqueeze(0))
+            tokens = self.tokenizer.encode_index(x.unsqueeze(0))
+
         tokens = tokens.squeeze(0).flatten()
 
         seq_len = tokens.shape[0]
