@@ -23,8 +23,8 @@ class Compressor:
         """
 #         raise NotImplementedError()
         with torch.no_grad():
-            tokens = self.tokenizer.encode(x.unsqueeze(0))
-        tokens = tokens.squeeze(0)
+                tokens = self.tokenizer.encode(x.unsqueeze(0))
+        tokens = tokens.squeeze(0).flatten()
 
         seq_len = tokens.shape[0]
         vocab_size = self.autoregressive.n_tokens
@@ -54,11 +54,10 @@ class Compressor:
             cdfs.append(cdf.unsqueeze(0))
 
         cdfs_tensor = torch.cat(cdfs, dim=0).cpu()
-
         symbols = tokens.cpu().to(torch.int16)
-
         byte_stream = torchac.encode_float_cdf(cdfs_tensor, symbols, check_input_bounds=True)
         return byte_stream
+
 
     def decompress(self, x: bytes) -> torch.Tensor:
         """
