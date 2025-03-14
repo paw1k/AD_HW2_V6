@@ -169,6 +169,7 @@ class PatchAutoEncoder(torch.nn.Module, PatchAutoEncoderBase):
     def encode(self, x: torch.Tensor) -> torch.Tensor:
 #         raise NotImplementedError()
         return self.encoder(x)
+
     def decode(self, x: torch.Tensor) -> torch.Tensor:
 #         raise NotImplementedError()
         return self.decoder(x)
