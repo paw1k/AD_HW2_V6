@@ -4,7 +4,7 @@ from typing import cast
 import numpy as np
 import torch
 from PIL import Image
-import torchac
+
 
 from .autoregressive import Autoregressive
 from .bsq import Tokenizer
