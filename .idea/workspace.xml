@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="1bdd9777-3037-4bad-8a15-582364f28282" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,5 +53,30 @@
       <updated>1741975458320</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="449" y="290" key="#Notifications" timestamp="1741976428163">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state x="449" y="290" key="#Notifications/0.25.1440.875/-325.-1055.1920.1055@0.25.1440.875" timestamp="1741976428162" />
+    <state x="320" y="199" key="Vcs.Push.Dialog.v2" timestamp="1741976297513">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state x="320" y="199" key="Vcs.Push.Dialog.v2/0.25.1440.875/-325.-1055.1920.1055@0.25.1440.875" timestamp="1741976297513" />
+    <state x="421" y="217" width="597" height="490" key="find.popup" timestamp="1741977234614">
+      <screen x="0" y="25" width="1440" height="875" />
+    </state>
+    <state x="421" y="217" width="597" height="490" key="find.popup/0.25.1440.875/-325.-1055.1920.1055@0.25.1440.875" timestamp="1741977234614" />
   </component>
 </project>

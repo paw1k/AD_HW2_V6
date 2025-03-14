@@ -119,6 +119,10 @@ class PatchAutoEncoder(torch.nn.Module, PatchAutoEncoderBase):
             self.conv = torch.nn.Sequential(
                 torch.nn.Conv2d(latent_dim, bottleneck, kernel_size=3, padding=1),
                 torch.nn.GELU(),
+                torch.nn.Dropout(0.1),
+                torch.nn.Conv2d(bottleneck, bottleneck, kernel_size=3, padding=1),
+                torch.nn.GELU(),
+                torch.nn.Dropout(0.1),
                 torch.nn.Conv2d(bottleneck, bottleneck, kernel_size=3, padding=1),
                 torch.nn.GELU(),
             )
