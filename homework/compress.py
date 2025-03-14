@@ -4,8 +4,6 @@ from typing import cast
 import numpy as np
 import torch
 from PIL import Image
-import pickle
-import zlib
 
 from .autoregressive import Autoregressive
 from .bsq import Tokenizer
@@ -24,13 +22,6 @@ class Compressor:
         Use arithmetic coding.
         """
 #         raise NotImplementedError()
-        with torch.no_grad():
-            tokens = self.tokenizer.encode_index(x.unsqueeze(0))
-        tokens_np = tokens.cpu().numpy()
-
-        raw_bytes = pickle.dumps(tokens_np)
-        compressed_bytes = zlib.compress(raw_bytes)
-        return compressed_bytes
 
 
     def decompress(self, x: bytes) -> torch.Tensor:
@@ -39,15 +30,6 @@ class Compressor:
         You may assume the output image is 150 x 100 pixels.
         """
 #         raise NotImplementedError()
-        raw_bytes = zlib.decompress(x)
-        tokens_np = pickle.loads(raw_bytes)
-
-        device = next(self.autoregressive.parameters()).device
-        tokens_torch = torch.from_numpy(tokens_np).long().to(device)
-
-        with torch.no_grad():
-            reconstructed = self.tokenizer.decode_index(tokens_torch)
-        return reconstructed.squeeze(0)
 
 
 def compress(tokenizer: Path, autoregressive: Path, image: Path, compressed_image: Path):
