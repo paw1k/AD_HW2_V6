@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from PIL import Image
 import pickle
+import zlib
 
 from .autoregressive import Autoregressive
 from .bsq import Tokenizer
