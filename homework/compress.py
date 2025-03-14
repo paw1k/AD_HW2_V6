@@ -46,7 +46,7 @@ class Compressor:
         tokens_torch = torch.from_numpy(tokens_np).long().to(device)
 
         with torch.no_grad():
-            reconstructed = self.tokenizer.decode(tokens_torch)
+            reconstructed = self.tokenizer.decode_index(tokens_torch.unsqueeze(0))
         return reconstructed.squeeze(0)
 
 
